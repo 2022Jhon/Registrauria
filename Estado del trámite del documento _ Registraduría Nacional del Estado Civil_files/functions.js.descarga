@@ -1,0 +1,11 @@
+ $(function(){$('#nuip').on('keypress',function(e){var key=e.keyCode||e.which;var caracter=String.fromCharCode(key).toLowerCase();var filtro=new RegExp("^[0-9]$");return(filtro.test(caracter));});$('#form').submit(function(e){e.preventDefault();return validar();});function validar(){var error=false;var nuip=$('#nuip').val();var token=$('#token').val();var cptcha=grecaptcha.getResponse();var formData=new FormData();formData.append('nuip',nuip);formData.append('token',token);formData.append('g-recaptcha-response',cptcha);$("#error").html("");$("#div_error").addClass('hidden');for(var i=0;i<$("input").length;i++){$("input")[i].setAttribute("style","");}
+if(nuip.length>0){nuip=parseInt(nuip,11);nuip=nuip.toString();if(nuip.length<2||nuip.length>11){error=["nuip","Digite un n&uacute;mero de Identificaci&oacute;n v&aacute;lido"];return errores(error);}}else{error=["nuip","Digite un n&uacute;mero"];return errores(error);}
+if(cptcha.length==0){error=["cptcha","Marque el cuadro de verificaci&oacute;n (Captcha: No soy un robot)"];return errores(error);}
+if(error===false){$.ajax({type:"POST",url:location,dataType:"json",data:formData,contentType:false,cache:false,processData:false,beforeSend:function(){$('.form-process').fadeIn();}}).done(function(response){$('.form-process').fadeOut();$("#success").html('');grecaptcha.reset();if(response.success){$("#success").html(response.data.message);}else{if(response.reload){location.reload();}else{$("#success").html(response.data.message);}}}).fail(function(jqXHR,textStatus,errorThrown){var error='Request: '+jqXHR+'<br>Request failed: '+textStatus+'<br>Exeption: '+errorThrown;$("#error").html(error);$("#div_error").removeClass('hidden').addClass('show');$("#btn-error").addClass('hidden');$('.form-process').fadeOut();});}
+return true;}
+function errores(error){$("#"+error[0]).focus();$("#"+error[0]).css("border","2px solid red");$("#error").html(error[1]);$("#div_error").removeClass('hidden').addClass('show');return false;}});function validaCaracter(e,tipo){var key=e.keyCode||e.which;var caracter=String.fromCharCode(key).toLowerCase();if(tipo=="numero")
+var filtro=/^[0-9\b\t]$/;else if(tipo=="texto")
+var filtro=/^[a-zA-ZñÑ\b\s\t]$/;else if(tipo=="alfa")
+var filtro=/^[0-9a-zA-ZñÑ\b\t]$/;else if(tipo=="nombres")
+var filtro=/^[a-zA-ZñÑ\-._'\b\s\t]$/;else
+var filtro=/^[\b]$/;return(filtro.test(caracter));}
